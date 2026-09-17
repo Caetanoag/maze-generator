@@ -27,11 +27,26 @@
 <body>
     <main>
         <h1>Maze Generator</h1>
+		
+        <section id="menu">
+			<fieldset>
+				<label for="altura">Altura do grid: 
+					<input type="number" id="altura" name="altura" min="2" max="50" value="21">
+				</label>
+				
+				<label for="largura">Largura do grid: 
+					<input type="number" id="largura" name="largura" min="2" max="50" value="21">
+				</label>
+				
+                <input type="button" id="submit" name="submit" value="enviar">
+			</fieldset>
+		</section>
+		
         <section id="canvas">
             <h2>Maze</h2>
             <canvas id="maze-canvas"></canvas>
         </section>
-    </main>
+	</main>
     <script type="module" src="src/main.js"></script>
 </body>
 
