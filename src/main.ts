@@ -1,5 +1,13 @@
-import { CanvasRenderer, Color, Rect } from "../lib/index.js";
+import { CanvasRenderer, Color, Rect, Vector2 } from "../lib/index.js";
 
+interface Line {
+	start: Vector2;
+	end: Vector2;
+}
+interface Cell {
+	rectangle: Rect;
+	walls: Array<Line>;
+}
 const canvas = document.querySelector("canvas");
 const renderer = new CanvasRenderer(canvas as HTMLCanvasElement);
 
@@ -13,12 +21,12 @@ const cellSize: number = Math.min(
 );
 renderer.fillRect(
 	new Rect(0, 0, columns * cellSize, rows * cellSize),
-	Color.black(),
+	Color.white(),
 );
-const cells: Rect[][] = Array.from({ length: columns }, () =>
+const cells: Cell[][] = Array.from({ length: columns }, () =>
 	Array.from({ length: rows }),
 );
-const randomCell = (): Rect => {
+const randomCell = (): Cell => {
 	const line = cells[Math.trunc(Math.random() * columns)];
 	if (!line)
 		throw new Error("Invalid address, something went very wrong (Row)");
@@ -27,19 +35,46 @@ const randomCell = (): Rect => {
 		throw new Error("Invalid address, something went very wrong (Column)");
 	return column;
 };
+const getWalls = (rectangle: Rect): Array<Line> => {
+	const topLeftVec = new Vector2(rectangle.left, rectangle.top);
+	const bottomLeftVec = new Vector2(rectangle.left, rectangle.bottom);
+	const topRightVec = new Vector2(rectangle.right, rectangle.top);
+	const bottomRightVec = new Vector2(rectangle.right, rectangle.bottom);
+
+	const topWall = { start: topLeftVec, end: topRightVec };
+	const bottomWall = { start: bottomLeftVec, end: bottomRightVec };
+	const leftWall = { start: topLeftVec, end: bottomLeftVec };
+	const rightWall = { start: topRightVec, end: bottomRightVec };
+
+	return [topWall, bottomWall, leftWall, rightWall];
+};
+const drawWall = (wall: Line, color: Color, width: number): void => {
+	renderer.drawLine(wall.start, wall.end, color, width);
+};
 for (let i = 0; i < columns; i++) {
 	for (let j = 0; j < rows; j++) {
 		const gap = cellSize * 0.1;
-		const cell = new Rect(
+		const rectangle = new Rect(
 			i * cellSize + gap / 2,
 			j * cellSize + gap / 2,
 			cellSize - gap,
 			cellSize - gap,
 		);
+		const walls = getWalls(rectangle);
 		const line = cells[i];
-		if (line) line[j] = cell;
-		renderer.fillRect(cell, Color.white());
+
+		if (line)
+			line[j] = {
+				rectangle,
+				walls,
+			};
 	}
 }
-
+for (const column of cells) {
+	for (const row of column) {
+		for (const wall of row.walls) {
+			drawWall(wall, Color.black(), cellSize * 0.1);
+		}
+	}
+}
 console.log(randomCell());
