@@ -123,7 +123,8 @@ function update() {
     }
 
     algoritmo(cells);
-
+    cells[0][0].walls[0].aberta = true;
+    cells[columns - 1][rows - 1].walls[1].aberta = true;
     for (const column of cells) {
         for (const row of column) {
             for (const wall of row.walls) {
